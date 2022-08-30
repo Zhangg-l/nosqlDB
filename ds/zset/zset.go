@@ -215,6 +215,7 @@ func (z *SortedSet) ZRem(key, member string) bool {
 	v, exist := z.record[key].dict[member]
 	if exist {
 		z.record[key].skl.sklDelete(v.score, member)
+		delete(z.record[key].dict, member)
 		return true
 	}
 	return false
@@ -228,7 +229,7 @@ func (z *SortedSet) ZGetByRank(key string, rank int) (val []interface{}) {
 	}
 	score, member := z.getByRank(key, rank, false)
 
-	return append(val, score, member)
+	return append(val,member,score  )
 }
 
 func (z *SortedSet) ZRevGetByRank(key string, rank int) (val []interface{}) {
@@ -237,7 +238,7 @@ func (z *SortedSet) ZRevGetByRank(key string, rank int) (val []interface{}) {
 	}
 	score, member := z.getByRank(key, rank, true)
 
-	return append(val, score, member)
+	return append(val, member,score )
 }
 
 // ZScoreRange returns all the elements in the sorted set at key with a score between min and max (including elements with score equal to min or max).
@@ -314,7 +315,7 @@ func (z *SortedSet) ZRevScoreRange(key string, min, max float64) (val []interfac
 			break
 		}
 		val = append(val, p.member, p.score)
-		p = p.level[0].forward
+		p = p.backward
 	}
 
 	return
